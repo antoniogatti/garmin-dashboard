@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Garmin Premium Dashboard</title>
+  <style>
+    :root {
+      --bg-0: #070b16;
+      --bg-1: #0b1020;
+      --bg-2: #152447;
+      --card: rgba(16, 24, 46, 0.82);
+      --card-soft: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.12);
+      --text: #edf2ff;
+      --muted: #a9b4d8;
+      --accent: #7c3aed;
+      --green: #22c55e;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --blue: #4f46e5;
+      --shadow: 0 24px 70px rgba(0,0,0,0.40);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -20%, #1f2f65 0%, transparent 60%),
+        radial-gradient(1000px 520px at 100% -10%, #2c1658 0%, transparent 62%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 30%, var(--bg-0) 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 24px; }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .hero { padding: 22px; }
+    .hero-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 16px; }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(124,58,237,0.16);
+      border: 1px solid rgba(124,58,237,0.35);
+      color: #dfd4ff;
+      font-size: 12px;
+      letter-spacing: .08em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    h1 { margin: 12px 0 8px; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; }
+    .lead { margin: 0; color: var(--muted); line-height: 1.58; max-width: 72ch; }
+
+    .status-row { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card-soft);
+      color: #dde5ff;
+      font-size: 13px;
+    }
+    .pill.good {
+      background: rgba(34,197,94,0.19);
+      border-color: rgba(34,197,94,0.45);
+      color: #cbf8d7;
+      font-weight: 700;
+    }
+
+    .kpi-col { display: grid; gap: 10px; }
+    .kpi {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(15,24,46,0.92);
+    }
+    .kpi .k { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .kpi .v { margin-top: 5px; font-size: 32px; font-weight: 800; line-height: 1; }
+    .kpi .s { margin-top: 6px; color: var(--muted); font-size: 12px; }
+
+    .timeline-wrap {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 14px;
+    }
+    .timeline-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .timeline-head h2 { margin: 0; font-size: 18px; }
+    .timeline-head span { color: var(--muted); font-size: 12px; }
+    .spark-grid { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .spark {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(255,255,255,0.04);
+    }
+    .spark h4 { margin: 0 0 7px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .spark svg { width: 100%; height: 74px; display: block; }
+
+    .section { margin-top: 16px; padding: 18px; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; flex-wrap: wrap; }
+    .section-head h3 { margin:0; font-size: 22px; }
+    .section-head p { margin:6px 0 0; color: var(--muted); font-size: 13px; }
+
+    .module-grid { display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 14px; margin-top: 14px; }
+    .module-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+    }
+
+    .donut-wrap { display:grid; place-items:center; min-height: 250px; }
+    .donut-label { text-align:center; margin-top:-140px; pointer-events:none; }
+    .donut-label strong { display:block; font-size: 24px; }
+    .donut-label span { color: var(--muted); font-size: 12px; }
+
+    .toggle {
+      display:inline-flex;
+      gap: 6px;
+      padding: 5px;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+    }
+    .toggle button {
+      border: 0;
+      border-radius: 9px;
+      padding: 8px 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .toggle button.active { background: rgba(124,58,237,0.25); color: #f0ebff; }
+
+    .break-list { display:grid; gap: 9px; margin-top: 10px; }
+    .break-row {
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+    }
+    .break-head { display:flex; justify-content:space-between; gap: 10px; align-items: baseline; }
+    .break-head strong { font-size: 13px; }
+    .break-head span { color: var(--muted); font-size: 12px; }
+    .bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.10); margin-top: 8px; overflow:hidden; }
+    .fill { height:100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--cyan)); }
+
+    .table-tools { margin-top: 14px; display:flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border:1px solid var(--border); background: rgba(255,255,255,0.05); color:#e3e9ff;
+      padding:8px 11px; border-radius: 999px; font-size: 12px; cursor:pointer;
+    }
+    .chip.active { background: rgba(34,197,94,0.20); border-color: rgba(34,197,94,0.45); color:#cbf8d7; }
+
+    .table-wrap { margin-top: 12px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1040px; }
+    thead th {
+      text-align:left; padding: 10px 8px;
+      text-transform:uppercase; letter-spacing:.05em;
+      color: #c9d4ff; font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 14px;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.04); }
+    .sport-tag {
+      display:inline-flex; padding:4px 9px; border-radius:999px; font-size:12px; font-weight:700;
+      background: rgba(124,58,237,0.16); border:1px solid rgba(124,58,237,0.34); color:#dfd5ff;
+    }
+
+    @media (max-width: 1060px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .module-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .wrap { padding: 14px; }
+      .spark-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Garmin premium overview</div>
+          <h1>Timeline focus: steps, sleep, body battery</h1>
+          <p class="lead">Header più grafico e interattivo: stato primario su passi/sonno/body battery con timeline sparkline. Attività trasformate in modulo analitico con donut + breakdown chart.</p>
+          <div class="status-row">
+            <div class="pill good" id="stepsState">Passi oggi: —</div>
+            <div class="pill" id="sleepState">Sonno: —</div>
+            <div class="pill" id="batteryState">Body Battery: —</div>
+            <div class="pill" id="inactiveState">Inattività: —</div>
+          </div>
+        </div>
+
+        <div class="kpi-col" id="kpiCol"></div>
+      </div>
+
+      <div class="timeline-wrap">
+        <div class="timeline-head">
+          <h2>Timeline rapida ultimi 7 giorni</h2>
+          <span>Interattiva: punta il cursore sui grafici per leggere il trend</span>
+        </div>
+        <div class="spark-grid">
+          <div class="spark">
+            <h4>Passi</h4>
+            <svg id="sparkSteps" viewBox="0 0 320 74"></svg>
+          </div>
+          <div class="spark">
+            <h4>Sonno (h)</h4>
+            <svg id="sparkSleep" viewBox="0 0 320 74"></svg>
+          </div>
+          <div class="spark">
+            <h4>Body Battery high</h4>
+            <svg id="sparkBattery" viewBox="0 0 320 74"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <div class="section-head">
+        <div>
+          <h3>Attività — modulo analitico</h3>
+          <p>Non più lista semplice: vista dashboard con mix per tipologia e breakdown dinamico.</p>
+        </div>
+        <div class="toggle" role="tablist" aria-label="Metrica attività">
+          <button data-metric="distance" class="active">Distanza</button>
+          <button data-metric="duration">Durata</button>
+          <button data-metric="count">Sessioni</button>
+        </div>
+      </div>
+
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="donut-wrap">
+            <svg id="donut" viewBox="0 0 320 320" width="320" height="320"></svg>
+            <div class="donut-label" id="donutLabel"></div>
+          </div>
+        </div>
+        <div class="module-card">
+          <h4 style="margin:0 0 6px; font-size:14px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase;">Breakdown per sport</h4>
+          <div class="break-list" id="breakList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <div class="section-head">
+        <div>
+          <h3>Tabella completa attività</h3>
+          <p>Richiesta mantenuta: log completo sempre visibile in fondo.</p>
+        </div>
+      </div>
+
+      <div class="table-tools" id="sportFilters"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Sport</th>
+              <th>Titolo</th>
+              <th>Durata (min)</th>
+              <th>Distanza (km)</th>
+            </tr>
+          </thead>
+          <tbody id="activityTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+<script>
+const data = {
+  "today": "2026-08-22",
+  "latestActivityDate": "2026-08-16T13:54:38",
+  "todaySummary": {
+    "steps": 7657,
+    "sleep_hours": 3.1,
+    "sleep_score": 26,
+    "body_battery": 5,
+    "stress_avg": 61
+  },
+  "days": [
+    {
+      "date": "2026-08-16",
+      "steps": 12922,
+      "sleep_hours": 6.5,
+      "sleep_score": 74,
+      "body_battery_high": 43,
+      "body_battery_low": 5,
+      "stress_avg": 40,
+      "activity": true
+    },
+    {
+      "date": "2026-08-17",
+      "steps": 1787,
+      "sleep_hours": 3.68,
+      "sleep_score": 29,
+      "body_battery_high": 15,
+      "body_battery_low": 5,
+      "stress_avg": 42,
+      "activity": false
+    },
+    {
+      "date": "2026-08-18",
+      "steps": 2111,
+      "sleep_hours": 0,
+      "sleep_score": 0,
+      "body_battery_high": 55,
+      "body_battery_low": 5,
+      "stress_avg": 33,
+      "activity": false
+    },
+    {
+      "date": "2026-08-19",
+      "steps": 848,
+      "sleep_hours": 3.72,
+      "sleep_score": 46,
+      "body_battery_high": 82,
+      "body_battery_low": 11,
+      "stress_avg": 20,
+      "activity": false
+    },
+    {
+      "date": "2026-08-20",
+      "steps": 3309,
+      "sleep_hours": 3.57,
+      "sleep_score": 29,
+      "body_battery_high": 83,
+      "body_battery_low": 5,
+      "stress_avg": 46,
+      "activity": false
+    },
+    {
+      "date": "2026-08-21",
+      "steps": 5283,
+      "sleep_hours": 2.94,
+      "sleep_score": 25,
+      "body_battery_high": 35,
+      "body_battery_low": 5,
+      "stress_avg": 49,
+      "activity": false
+    },
+    {
+      "date": "2026-08-22",
+      "steps": 7657,
+      "sleep_hours": 3.15,
+      "sleep_score": 26,
+      "body_battery_high": 9,
+      "body_battery_low": 5,
+      "stress_avg": 61,
+      "activity": false
+    }
+  ],
+  "activities": [
+    {
+      "date": "2026-08-16 13:54:38",
+      "sport": "kiteboarding",
+      "distance_km": 15.15,
+      "duration_minutes": 56.8,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-12 11:12:12",
+      "sport": "kiteboarding",
+      "distance_km": 17.43,
+      "duration_minutes": 55.3,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-12 09:16:43",
+      "sport": "kiteboarding",
+      "distance_km": 28.45,
+      "duration_minutes": 83.1,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-09 14:49:56",
+      "sport": "kiteboarding",
+      "distance_km": 0.19,
+      "duration_minutes": 9.5,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-09 13:03:19",
+      "sport": "kiteboarding",
+      "distance_km": 13.67,
+      "duration_minutes": 64.3,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-08 15:48:39",
+      "sport": "kiteboarding",
+      "distance_km": 14.21,
+      "duration_minutes": 54.5,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-08 13:16:51",
+      "sport": "kiteboarding",
+      "distance_km": 22.95,
+      "duration_minutes": 80,
+      "title": "Brindisi Kiteboarding"
+    },
+    {
+      "date": "2026-08-02 14:28:16",
+      "sport": "stand_up_paddleboarding",
+      "distance_km": 1.42,
+      "duration_minutes": 32,
+      "title": "Brindisi Stand Up Paddleboarding"
+    },
+    {
+      "date": "2026-07-31 16:44:28",
+      "sport": "kiteboarding",
+      "distance_km": 20.57,
+      "duration_minutes": 64.8,
+      "title": "Torchiarolo Kiteboarding"
+    },
+    {
+      "date": "2026-07-24 14:52:41",
+      "sport": "kiteboarding",
+      "distance_km": 28.78,
+      "duration_minutes": 98.3,
+      "title": "Brindisi Kiteboarding"
+    }
+  ]
+};
+
+const COLORS = ["#7c3aed", "#06b6d4", "#22c55e", "#f59e0b", "#ef4444", "#4f46e5", "#e879f9"];
+
+function fmt(v, digits = 0){
+  return v.toLocaleString('it-IT', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+function sportLabel(s){ return s.replaceAll('_v2','').replaceAll('_',' '); }
+function daysBetween(a, b){
+  const da = new Date(a + 'T00:00:00');
+  const db = new Date(b + 'T00:00:00');
+  return Math.round((db - da) / 86400000);
+}
+
+const inactive = daysBetween(data.latestActivityDate.slice(0,10), data.today);
+const latest = data.activities[0];
+
+document.getElementById('stepsState').textContent = `Passi oggi: ${fmt(data.todaySummary.steps)} (sopra 2k)`;
+document.getElementById('sleepState').textContent = `Sonno ${data.todaySummary.sleep_hours.toFixed(1)}h · score ${data.todaySummary.sleep_score}`;
+document.getElementById('batteryState').textContent = `Body Battery: ${data.todaySummary.body_battery}`;
+document.getElementById('inactiveState').textContent = `Ultima attività ${inactive} giorni fa`;
+
+document.getElementById('kpiCol').innerHTML = [
+  { k:'Passi oggi', v: fmt(data.todaySummary.steps), s:'stato in crescita, oltre 2k' },
+  { k:'Sonno', v: data.todaySummary.sleep_hours.toFixed(1) + ' h', s:'sleep score ' + data.todaySummary.sleep_score },
+  { k:'Body Battery', v: String(data.todaySummary.body_battery), s:'energia residua attuale' }
+].map(x => `<div class="kpi"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="s">${x.s}</div></div>`).join('');
+
+function renderSpark(svgId, values, color){
+  const svg = document.getElementById(svgId);
+  const W = 320, H = 74, pad = 6;
+  const min = Math.min(...values), max = Math.max(...values);
+  const span = (max - min) || 1;
+  const step = (W - pad*2) / (values.length - 1);
+  const pts = values.map((v, i) => {
+    const x = pad + i * step;
+    const y = H - pad - ((v - min) / span) * (H - pad*2);
+    return {x,y,v};
+  });
+  let path = `M ${pts[0].x} ${pts[0].y}`;
+  for(let i=1;i<pts.length;i++) path += ` L ${pts[i].x} ${pts[i].y}`;
+  const area = path + ` L ${pts[pts.length-1].x} ${H-pad} L ${pts[0].x} ${H-pad} Z`;
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="g-${svgId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.52"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <path d="${area}" fill="url(#g-${svgId})"></path>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"></path>
+    ${pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.2" fill="${color}"><title>${p.v}</title></circle>`).join('')}
+  `;
+}
+
+renderSpark('sparkSteps', data.days.map(d => d.steps), '#22c55e');
+renderSpark('sparkSleep', data.days.map(d => d.sleep_hours), '#06b6d4');
+renderSpark('sparkBattery', data.days.map(d => d.body_battery_high), '#7c3aed');
+
+const grouped = {};
+for (const a of data.activities) {
+  const key = sportLabel(a.sport);
+  if (!grouped[key]) grouped[key] = { sport:key, distance:0, duration:0, count:0 };
+  grouped[key].distance += a.distance_km;
+  grouped[key].duration += a.duration_minutes;
+  grouped[key].count += 1;
+}
+let rows = Object.values(grouped);
+
+let currentMetric = 'distance';
+let currentFilter = 'all';
+
+function metricValue(r){
+  if (currentMetric === 'distance') return r.distance;
+  if (currentMetric === 'duration') return r.duration;
+  return r.count;
+}
+function metricUnit(){
+  if (currentMetric === 'distance') return 'km';
+  if (currentMetric === 'duration') return 'min';
+  return 'sessioni';
+}
+
+function renderDonut(){
+  const svg = document.getElementById('donut');
+  const label = document.getElementById('donutLabel');
+  const total = rows.reduce((s,r) => s + metricValue(r), 0) || 1;
+  const cx = 160, cy = 160, R = 105;
+  let start = -90;
+  const arcs = [];
+
+  rows
+    .sort((a,b) => metricValue(b) - metricValue(a))
+    .forEach((r, i) => {
+      const value = metricValue(r);
+      const angle = (value / total) * 360;
+      const end = start + angle;
+      const largeArc = angle > 180 ? 1 : 0;
+      const x1 = cx + R * Math.cos((Math.PI/180) * start);
+      const y1 = cy + R * Math.sin((Math.PI/180) * start);
+      const x2 = cx + R * Math.cos((Math.PI/180) * end);
+      const y2 = cy + R * Math.sin((Math.PI/180) * end);
+      arcs.push(`<path d="M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2}" stroke="${COLORS[i % COLORS.length]}" stroke-width="32" fill="none" stroke-linecap="round"><title>${r.sport}: ${fmt(value, currentMetric==='count'?0:1)} ${metricUnit()}</title></path>`);
+      start = end;
+    });
+
+  svg.innerHTML = `
+    <circle cx="160" cy="160" r="105" stroke="rgba(255,255,255,0.12)" stroke-width="32" fill="none"></circle>
+    ${arcs.join('')}
+  `;
+
+  const top = [...rows].sort((a,b) => metricValue(b)-metricValue(a))[0];
+  label.innerHTML = `<strong>${fmt(metricValue(top), currentMetric==='count'?0:1)} ${metricUnit()}</strong><span>top: ${top.sport}</span>`;
+}
+
+function renderBreakdown(){
+  const container = document.getElementById('breakList');
+  const sorted = [...rows].sort((a,b) => metricValue(b)-metricValue(a));
+  const max = metricValue(sorted[0]) || 1;
+  container.innerHTML = sorted.map((r, i) => {
+    const value = metricValue(r);
+    const w = Math.max(6, Math.round((value / max) * 100));
+    const hint = `${fmt(r.distance,2)} km · ${fmt(r.duration,1)} min · ${r.count} sessioni`;
+    return `
+      <div class="break-row">
+        <div class="break-head">
+          <strong>${r.sport}</strong>
+          <span>${fmt(value, currentMetric==='count'?0:1)} ${metricUnit()}</span>
+        </div>
+        <div class="bar"><div class="fill" style="width:${w}%; background: linear-gradient(90deg, ${COLORS[i % COLORS.length]}, #22c55e)"></div></div>
+        <div style="margin-top:6px; color:var(--muted); font-size:12px;">${hint}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderFilters(){
+  const sports = ['all', ...rows.map(r => r.sport)];
+  const wrap = document.getElementById('sportFilters');
+  wrap.innerHTML = sports.map(s => `<button class="chip ${currentFilter===s?'active':''}" data-filter="${s}">${s==='all'?'Tutti gli sport':s}</button>`).join('');
+  [...wrap.querySelectorAll('.chip')].forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.dataset.filter;
+      renderFilters();
+      renderTable();
+    });
+  });
+}
+
+function renderTable(){
+  const tbody = document.getElementById('activityTable');
+  const filtered = currentFilter === 'all'
+    ? data.activities
+    : data.activities.filter(a => sportLabel(a.sport) === currentFilter);
+
+  tbody.innerHTML = filtered.map((a, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${a.date}</td>
+      <td><span class="sport-tag">${sportLabel(a.sport)}</span></td>
+      <td>${a.title}</td>
+      <td>${fmt(a.duration_minutes,1)}</td>
+      <td>${fmt(a.distance_km,2)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderAll(){
+  renderDonut();
+  renderBreakdown();
+  renderFilters();
+  renderTable();
+}
+
+renderAll();
+
+[...document.querySelectorAll('.toggle button')].forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMetric = btn.dataset.metric;
+    renderDonut();
+    renderBreakdown();
+  });
+});
+</script>
+</body>
+</html>
