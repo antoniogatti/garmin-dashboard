@@ -1,5 +1,7 @@
 # Garmin Dashboard
 
-Public GitHub Pages dashboard for Garmin activity, steps, sleep, and body battery.
+Public Garmin dashboard with daily updates on GitHub Pages.
 
-The page is refreshed from the local Garmin MCP setup and published to GitHub Pages.
+Live site: https://antoniogatti.github.io/garmin-dashboard/
+
+The page is refreshed from the local Garmin MCP setup and pushed to the public repo automatically every day.
